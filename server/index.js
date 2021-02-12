@@ -28,8 +28,7 @@ app.use('/result',resultRouter)
 
 
 app.get('/',async (req,res)=>{
-    console.log(req.session);
-    res.send('123'+req.session.user)
+    res.send('hello')
 })
 
 app.listen(3001,()=>{
