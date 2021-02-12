@@ -16,6 +16,8 @@
     </div>
 </template>
 <script>
+    import router from "../router";
+
     export default {
         data() {
             return {
@@ -27,8 +29,28 @@
         },
         methods: {
             onSubmit() {
-                this.$http.post('/user/login',this.form).then((res)=>{
-                    console.log(res);
+                this.$http.post('/admin/login',this.form).then((res)=>{
+                  if(res.data.code===200){
+                      this.$message({
+                          message: '登录成功',
+                          type:"success"
+                      });
+
+                      this.$cookie.set('token', res.data.data.token,7);
+                      localStorage.setItem('user',JSON.stringify(res.data.data));
+                      setTimeout(()=>{
+                          if(res.data.data.power===1){
+                              router.push("/userInfo")
+                          }else{
+                              router.push("/myself")
+                          }
+                      },1000)
+                  }else{
+                      this.$message({
+                          message: res.data.msg,
+                          type:"error"
+                      });
+                  }
                 })
                 console.log("submit!");
             }

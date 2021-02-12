@@ -6,7 +6,30 @@
 const express = require('express');
 const router = express.Router();
 const {Results} = require('../db/Results')
+const {User} = require('../db/User')
 
+router.use(async (req, res, next) => {
+    const user = await User.findOne({'token':req.cookies['token']});
+    if (user) {
+        if (user.power == 1) {
+            next();
+        } else {
+            res.status(500).json({
+                code: 10001,
+                msg: '权限不足,无法访问!!',
+                data: null,
+            });
+        }
+    } else {
+        res.status(401).json({
+            code: 10002,
+            msg: '未登录,无法访问!!',
+            data: null,
+        });
+    }
+
+
+});
 
 router.post('/addResult',async (req,res)=>{
     let result = null;
@@ -27,10 +50,24 @@ router.post('/addResult',async (req,res)=>{
 
 router.get('/getResults',async (req,res)=>{
     const start = req.query.page>0?req.query.page-1:req.query.page;
-    const result = await Promise.all([
-        Results.count(),
-        Results.find().skip(start*10).limit(10)
-    ]);
+    let result = null;
+    let orderName = req.query.order!=='ascending'?"desc":"asc";
+    let propName = req.query.prop;
+    const ordRule={};
+    ordRule[propName]=orderName;
+    console.log(propName,orderName,ordRule)
+    if( propName && orderName){
+        result = await Promise.all([
+            Results.count(),
+            Results.find().sort(ordRule).skip(start*10).limit(10)
+        ]);
+    }else{
+        result = await Promise.all([
+            Results.count(),
+            Results.find().skip(start*10).limit(10)
+        ]);
+    }
+
     res.json({
         code: 200,
         msg: 'ok',

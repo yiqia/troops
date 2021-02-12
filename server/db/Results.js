@@ -7,8 +7,8 @@ const mongoose = require("mongoose");
 require("../config/mongodb");
 const Results = mongoose.model("Results", new mongoose.Schema({
     name: {type: String},
-    high_bar: {type: String},
-    parallel_bars: {type: String},
+    high_bar: {type: Number},
+    parallel_bars: {type: Number},
     tree_kilometers: {type: String},
     gun_dis: {type: String},
     rapid_reload: {type: String},

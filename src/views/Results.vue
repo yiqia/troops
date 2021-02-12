@@ -13,6 +13,7 @@
         </div>
         <el-table
                 :data="tableData"
+                @sort-change="changeSort"
                 style="width: 100%">
             <el-table-column
                     label="姓名"
@@ -30,7 +31,8 @@
             </el-table-column>
             <el-table-column
                     label="单杠"
-                    sortable
+                    prop="high_bar"
+                    sortable="custom"
                     width="80">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -40,7 +42,8 @@
             </el-table-column>
             <el-table-column
                     label="双杠"
-                    sortable
+                    prop="parallel_bars"
+                    sortable="custom"
                     width="80">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -50,7 +53,8 @@
             </el-table-column>
             <el-table-column
                     label="三公里"
-                    sortable
+                    prop="tree_kilometers"
+                    sortable="custom"
                     width="100">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -60,7 +64,8 @@
             </el-table-column>
             <el-table-column
                     label="枪械拆装"
-                    sortable
+                    prop="gun_dis"
+                    sortable="custom"
                     width="100">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -70,7 +75,8 @@
             </el-table-column>
             <el-table-column
                     label="快速装填子弹"
-                    sortable
+                    prop="rapid_reload"
+                    sortable="custom"
                     width="130">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -80,7 +86,8 @@
             </el-table-column>
             <el-table-column
                     label="十秒防护"
-                    sortable
+                    prop="ten_protection"
+                    sortable="custom"
                     width="100">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -90,7 +97,8 @@
             </el-table-column>
             <el-table-column
                     label="30×2折返跑"
-                    sortable
+                    prop="run"
+                    sortable="custom"
                     width="130">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -101,7 +109,8 @@
 
             <el-table-column
                     label="日期"
-                    sortable
+                    prop="date"
+                    sortable="custom"
                     width="180">
                 <template slot-scope="scope">
                     <div class="table-input">
@@ -147,53 +156,38 @@
                 searchData:[],
                 searchCount:0,
                 searchPage:1,
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                }, {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                }, {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                }, {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                },]
+                isOrder:false,
+                tableData: []
             }
         },
         mounted() {
             this.getData();
         },
         methods: {
+            changeSort( column ){
+                this.page = 1;
+                if(column.order) {
+                    this.isOrder=true
+                    this.$http.get('/result/getResults',{params:{
+                            page:this.page,
+                            order:column.order,
+                            prop:column.prop
+                        }}).then((res)=>{
+                        if(res.data.code==200){
+                            this.tableData=res.data.data.list;
+                            this.count=res.data.data.count;
+                        }else{
+                            this.$message({
+                                message: '获取数据失败',
+                                type: 'warning'
+                            });
+                        }
+                    })
+                }else{
+                    this.isOrder=false
+                    this.getData();
+                }
+            },
             getData(){
                 this.$http.get(`/result/getResults?page=${this.page}`).then((res)=>{
                     if(res.data.code==200){
@@ -288,7 +282,7 @@
             },
             currentChange(page){
                 this.page=page;
-                this.getData();
+                this.isOrder?this.changeSort():this.getData();
             }
 
         }

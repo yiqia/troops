@@ -186,7 +186,7 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(({ value }) => {
-                    this.$http.post('/user/updatePass',{Id:row['_id'],password:value})
+                    this.$http.post('/admin/updatePass',{Id:row['_id'],password:value})
                     this.$message({
                         type: 'success',
                         message: '修改成功'
@@ -218,7 +218,7 @@
                 })
             },
             getData(){
-                this.$http.get(`/user/getUser?page=${this.page}`).then((res)=>{
+                this.$http.get(`/admin/getUser?page=${this.page}`).then((res)=>{
                     if(res.data.code==200){
                         this.tableData=res.data.data.list;
                         this.count=res.data.data.count;
@@ -232,7 +232,7 @@
             },
             handleEdit(index, row) {
                 console.log(index, row);
-                this.$http.post('/user/addUser',row).then((res)=>{
+                this.$http.post('/admin/addUser',row).then((res)=>{
                     if(res.data.code==200){
                         res.data.data['_id']?this.$set(this.tableData,index,res.data.data):'';
                         this.$message({
@@ -249,7 +249,7 @@
             },
             handleDelete(index, row) {
                 console.log(index, row);
-                this.$http.get(`/user/delUser?Id=${row['_id']}`).then((res)=>{
+                this.$http.get(`/admin/delUser?Id=${row['_id']}`).then((res)=>{
                     if(res.data.code==200){
                         this.tableData.splice(index,1);
                         this.$message({
@@ -289,7 +289,7 @@
                 }
                 this.searchPage=this.page;
                 this.page=1;
-                this.$http.post('/user/searchUser',{"name":value,"page":this.page}).then((res)=>{
+                this.$http.post('/admin/searchUser',{"name":value,"page":this.page}).then((res)=>{
                     if(res.data.code==200){
                         this.searchData=this.tableData;
                         this.searchCount=this.count;

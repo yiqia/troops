@@ -2,7 +2,9 @@
     <div id="app">
         <el-table
                 :data="tableData"
-                style="width: 100%">
+                style="width: 100%"
+                :default-sort = "{prop: 'date', order: 'descending'}"
+        >
             <el-table-column
                     label="姓名"
                     width="80">
@@ -12,6 +14,7 @@
             </el-table-column>
             <el-table-column
                     label="单杠"
+                    prop="high_bar"
                     sortable
                     width="80">
                 <template slot-scope="scope">
@@ -20,6 +23,7 @@
             </el-table-column>
             <el-table-column
                     label="双杠"
+                    prop="parallel_bars"
                     sortable
                     width="80">
                 <template slot-scope="scope">
@@ -28,6 +32,7 @@
             </el-table-column>
             <el-table-column
                     label="三公里"
+                    prop="tree_kilometers"
                     sortable
                     width="100">
                 <template slot-scope="scope">
@@ -36,6 +41,7 @@
             </el-table-column>
             <el-table-column
                     label="枪械拆装"
+                    prop="gun_dis"
                     sortable
                     width="100">
                 <template slot-scope="scope">
@@ -44,6 +50,7 @@
             </el-table-column>
             <el-table-column
                     label="快速装填子弹"
+                    prop="rapid_reload"
                     sortable
                     width="130">
                 <template slot-scope="scope">
@@ -52,6 +59,7 @@
             </el-table-column>
             <el-table-column
                     label="十秒防护"
+                    prop="ten_protection"
                     sortable
                     width="100">
                 <template slot-scope="scope">
@@ -60,6 +68,7 @@
             </el-table-column>
             <el-table-column
                     label="30×2折返跑"
+                    prop="run"
                     sortable
                     width="130">
                 <template slot-scope="scope">
@@ -68,28 +77,15 @@
             </el-table-column>
 
             <el-table-column
+                    prop="date"
                     label="日期"
                     sortable
-                    width="180">
+                   >
                 <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
                     <span style="margin-left: 10px">{{ scope.row.date }}</span>
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作">
-                <template slot-scope="scope">
-                    <el-button
-                            size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">编辑
-                    </el-button>
-                    <el-button
-                            size="mini"
-                            type="danger"
-                            @click="handleDelete(scope.$index, scope.row)">删除
-                    </el-button>
-                </template>
-            </el-table-column>
         </el-table>
     </div>
 </template>
@@ -99,48 +95,11 @@
         data() {
             return {
                 search:"",
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                }, {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                }, {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                }, {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    high_bar: 20,    // 单杠
-                    parallel_bars: 30,   // 双杠
-                    tree_kilometers: "2:30", // 三公里
-                    gun_dis: "2:30",    // 枪械拆装
-                    rapid_reload: "2:12", // 快速装填子弹
-                    ten_protection: "10",    // 十秒防护
-                    run: "3:20",         // 30×2折返跑
-                },]
+                tableData: []
             }
+        },
+        mounted() {
+            this.getResults();
         },
         methods: {
             handleEdit(index, row) {
@@ -148,6 +107,21 @@
             },
             handleDelete(index, row) {
                 console.log(index, row);
+            },
+            changeSort(column,prop,order ){
+                console.log( column, prop, order )
+            },
+            getResults(){
+                this.$http.get('/user/getResults').then((res)=>{
+                  if(res.data.code==200){
+                      this.tableData=res.data.data;
+                  }else{
+                      this.$message({
+                          message: '获取失败',
+                          type: 'error'
+                      });
+                  }
+                })
             },
             // 添加成绩
             addResults(){
